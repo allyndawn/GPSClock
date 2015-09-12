@@ -60,7 +60,7 @@
 //
 
 // Set to 'true' if you want to debug and listen to the raw GPS sentences
-#define GPSECHO  false
+#define GPSECHO true
 
 //
 //
@@ -105,7 +105,6 @@ void useInterrupt(boolean);
 void setup()  
 {    
   Serial.begin(115200);
-  Serial.println("GPSClock");
   
   currentHour = 0;
   currentMinute = 0;
@@ -116,9 +115,10 @@ void setup()
 
   GPS.begin(9600);
   
-  GPS.sendCommand(PMTK_SET_NMEA_OUTPUT_RMCGGA);
-  GPS.sendCommand(PMTK_SET_NMEA_UPDATE_5HZ);
-  GPS.sendCommand(PMTK_API_SET_FIX_CTL_5HZ);
+  // GPS.sendCommand(PMTK_SET_NMEA_OUTPUT_RMCGGA);
+  GPS.sendCommand(PMTK_SET_NMEA_OUTPUT_ALLDATA);
+  GPS.sendCommand(PMTK_SET_NMEA_UPDATE_1HZ);
+  // GPS.sendCommand(PMTK_API_SET_FIX_CTL_1HZ);
   
   useInterrupt(true);
   
