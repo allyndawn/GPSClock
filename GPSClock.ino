@@ -33,15 +33,8 @@
 //
 
 #include <Adafruit_GPS.h>
-#if ARDUINO >= 100
- // http://arduino.cc/en/Reference/softwareSerial
- #include <SoftwareSerial.h>
-#else
- // Older Arduino IDE requires NewSoftSerial, download from:
- // http://arduiniana.org/libraries/newsoftserial/
- // #include <NewSoftSerial.h>
- // DO NOT install NewSoftSerial if using Arduino 1.0 or later!
-#endif
+#include <SoftwareSerial.h>
+
 
 //
 //
@@ -68,11 +61,7 @@
 //
 //
 
-#if ARDUINO >= 100
-  SoftwareSerial mySerial(3, 2); // RX pin, TX pin
-#else
-  NewSoftSerial mySerial(3, 2);
-#endif
+SoftwareSerial mySerial(3, 2); // RX pin, TX pin
 Adafruit_GPS GPS(&mySerial);
 
 //
@@ -180,4 +169,3 @@ void loop() // run over and over again
     matrix.writeDisplay();
   }
 }
-
