@@ -26,70 +26,18 @@
 // https://github.com/adafruit/Adafruit-LED-Backpack-Library
 // https://github.com/adafruit/Adafruit-GFX-Library
 
-//
-//
-// Includes for GPS Library
-//
-//
-
 #include <Adafruit_GPS.h>
 #include <SoftwareSerial.h>
-
-
-//
-//
-// Includes for LED Libraries
-//
-//
-
 #include <Wire.h> // Arduino UNO and Mega
 #include "Adafruit_LEDBackpack.h"
 #include "Adafruit_GFX.h"
 
-//
-//
-// Global constants
-//
-//
-
-// Set to 'true' if you want to debug and listen to the raw GPS sentences
-#define GPSECHO true
-
-//
-//
-// Create GPS singleton
-//
-//
-
 SoftwareSerial mySerial(3, 2); // RX pin, TX pin
 Adafruit_GPS GPS(&mySerial);
-
-//
-//
-// Create LED singleton
-//
-//
-
 Adafruit_7segment matrix = Adafruit_7segment();
-
-//
-//
-// Global variables
-//
-//
-
 int currentHour;
 int currentMinute;
 int currentSeconds;
-
-//
-//
-// Func prototype keeps Arduino 0023 happy
-//
-//
-
-boolean usingInterrupt = false;
-void useInterrupt(boolean); 
 
 void setup()  
 {    
@@ -108,44 +56,12 @@ void setup()
   GPS.sendCommand(PMTK_SET_NMEA_OUTPUT_ALLDATA);
   GPS.sendCommand(PMTK_SET_NMEA_UPDATE_1HZ);
   // GPS.sendCommand(PMTK_API_SET_FIX_CTL_1HZ);
-  
-  useInterrupt(true);
-  
-  delay(1000);
 }
-
-//
-//
-// Interrupt is called once a millisecond, looks for any new GPS data, and stores it
-// writing direct to UDR0 is much much faster than Serial.print 
-// but only one character can be written at a time. 
-SIGNAL(TIMER0_COMPA_vect) {
-  char c = GPS.read();
-  // if you want to debug, this is a good time to do it!
-  if (GPSECHO) {
-    if (c) {
-      UDR0 = c;
-    }
-  }
-}
-
-void useInterrupt(boolean v) {
-  if (v) {
-    // Timer0 is already used for millis() - we'll just interrupt somewhere
-    // in the middle and call the "Compare A" function above
-    OCR0A = 0xAF;
-    TIMSK0 |= _BV(OCIE0A);
-    usingInterrupt = true;
-  } else {
-    // do not call the interrupt function COMPA anymore
-    TIMSK0 &= ~_BV(OCIE0A);
-    usingInterrupt = false;
-  }
-}
-
 
 void loop() // run over and over again
 {
+  GPS.read();
+
   if (GPS.newNMEAreceived()) {
     if (!GPS.parse(GPS.lastNMEA()))   // this also sets the newNMEAreceived() flag to false
       return;  // we can fail to parse a sentence in which case we should just wait for another
