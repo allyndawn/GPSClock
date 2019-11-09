@@ -35,42 +35,34 @@
 SoftwareSerial mySerial(3, 2); // RX pin, TX pin
 Adafruit_GPS GPS(&mySerial);
 Adafruit_7segment matrix = Adafruit_7segment();
-int currentHour;
-int currentMinute;
-int currentSeconds;
+unsigned long lastClockUpdateMillis;
+bool colonOn;
 
 void setup()  
 {    
   Serial.begin(9600);
-  
-  currentHour = 0;
-  currentMinute = 0;
-  currentSeconds = 0;
-  
+
+  lastClockUpdateMillis = 0;
+  colonOn = false;
+
   matrix.begin(0x70);
-  delay(500);
 
   GPS.begin(9600);
   
-  // GPS.sendCommand(PMTK_SET_NMEA_OUTPUT_RMCGGA);
   GPS.sendCommand(PMTK_SET_NMEA_OUTPUT_ALLDATA);
-  GPS.sendCommand(PMTK_SET_NMEA_UPDATE_1HZ);
-  // GPS.sendCommand(PMTK_API_SET_FIX_CTL_1HZ);
+  GPS.sendCommand(PMTK_SET_NMEA_UPDATE_200_MILLIHERTZ); // Once every 5 seconds
 }
 
-void loop() // run over and over again
-{
-  GPS.read();
+void maybeUpdateClock() {
+  // If we've updated the clock within the last second, don't bother doing it now
+  unsigned long timeNow = millis();
+  if ((timeNow < lastClockUpdateMillis) || (lastClockUpdateMillis + 1000 < timeNow)) {
+    lastClockUpdateMillis = timeNow;
 
-  if (GPS.newNMEAreceived()) {
-    if (!GPS.parse(GPS.lastNMEA()))   // this also sets the newNMEAreceived() flag to false
-      return;  // we can fail to parse a sentence in which case we should just wait for another
-  }
-  
-  if (GPS.seconds != currentSeconds) {
-    currentHour = GPS.hour;
-    currentMinute = GPS.minute;
-    currentSeconds = GPS.seconds;
+    colonOn = ! colonOn;
+
+    int currentHour = GPS.hour;
+    int currentMinute = GPS.minute;
     
     int hourTens = currentHour / 10;
     int hourOnes = currentHour % 10;
@@ -79,9 +71,20 @@ void loop() // run over and over again
     
     matrix.writeDigitNum(0, hourTens);
     matrix.writeDigitNum(1, hourOnes);
-    matrix.drawColon(0 == currentSeconds % 2);
+    matrix.drawColon(colonOn);
     matrix.writeDigitNum(3, minuteTens);
     matrix.writeDigitNum(4, minuteOnes);
     matrix.writeDisplay();
   }
+}
+
+void loop() // run over and over again
+{
+  GPS.read();
+  if (GPS.newNMEAreceived()) {
+    if (!GPS.parse(GPS.lastNMEA()))   // this also sets the newNMEAreceived() flag to false
+      return;  // we can fail to parse a sentence in which case we should just wait for another
+  }
+
+  maybeUpdateClock();
 }
