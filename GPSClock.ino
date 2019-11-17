@@ -209,13 +209,18 @@ void maybePlayChimes() {
 
 void loop() // run over and over again
 {
-  GPS.read();
+  char c = GPS.read();
+  if (c) {
+    Serial.print(c);
+  }
   if (GPS.newNMEAreceived()) {
     if (!GPS.parse(GPS.lastNMEA())) {
       return;
     }
     if (!bTimeAvailable) {
-      bTimeAvailable = true;
+      if ((GPS.hour != 0) && (GPS.minute != 0) && (GPS.seconds != 0)) {
+        bTimeAvailable = true;
+      }
     }
   }
 
@@ -244,6 +249,11 @@ void setup()
   chimeArray->setDebugStream(&Serial);
 
   matrix.begin(0x70);
+  matrix.writeDigitRaw(0, 0x40); // "-"
+  matrix.writeDigitRaw(1, 0x40);
+  matrix.writeDigitRaw(3, 0x40);
+  matrix.writeDigitRaw(4, 0x40);
+  matrix.writeDisplay();
 
   GPS.begin(9600);
   GPS.sendCommand(PMTK_SET_NMEA_UPDATE_200_MILLIHERTZ);

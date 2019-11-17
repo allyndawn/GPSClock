@@ -13,7 +13,7 @@ const unsigned short CHIMEARRAY_PITCH_B3 = 247;
 const unsigned short CHIMEARRAY_PITCH_E4 = 330;
 const unsigned short CHIMEARRAY_PITCH_FSHARP4 = 370;
 const unsigned short CHIMEARRAY_PITCH_GSHARP4 = 415;
-const unsigned short CHIMEARRAY_DURATION_QUARTER = 900;
+const unsigned short CHIMEARRAY_DURATION_QUARTER = 500;
 
 class ChimeArray{
   public:
