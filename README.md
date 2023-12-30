@@ -1,6 +1,8 @@
 # GPSClock
 Use GPS satellites to display the current UTC time with Adafruit GPS and LED breakouts and an Arduino. Great for remote cloud engineers.
 
+![](media/clock.png)
+
 ## Software
 
 ### Libraries
