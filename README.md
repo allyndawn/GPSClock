@@ -17,4 +17,6 @@ Use GPS satellites to display the current UTC time with Adafruit GPS and LED bre
 
 ## Wiring
 
+Note: Although it may seem odd to use analog pins for I2C, A4 and A5 are dedicated to I2C on Arduino UNOs as Serial Data (SDA) and Serial Clock (SCL) respectively. See https://docs.arduino.cc/learn/communication/wire#arduino-i2c-pins
+
 ![](media/wiring.png)
